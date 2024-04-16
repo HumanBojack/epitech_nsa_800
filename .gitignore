@@ -1,0 +1,4 @@
+*/volumes/
+*/.env
+
+pg-barman/
