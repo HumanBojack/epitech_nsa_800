@@ -1,0 +1,35 @@
+---
+services:
+  syncthing:
+    image: lscr.io/linuxserver/syncthing:latest
+    container_name: syncthing
+    # hostname: syncthing #optional
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+    volumes:
+      - ./volumes/config:/config
+      - ./volumes/data1:/data1
+      - ./volumes/data2:/data2
+    networks:
+      - traefik
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.syncthing.entrypoints=websecure"
+      - "traefik.http.routers.syncthing.tls.certresolver=letsencryptresolver"
+      - "traefik.http.routers.syncthing.tls=true"
+      - "traefik.http.routers.syncthing.rule=Host(`syncthing.pdm.musubi.dev`)"
+      - "traefik.http.services.syncthing.loadbalancer.server.port=8384"
+      - "traefik.docker.network=traefik"
+    # ports:
+    #   - 8384:8384
+    #   - 22000:22000/tcp
+    #   - 22000:22000/udp
+    #   - 21027:21027/udp
+    restart: unless-stopped
+
+networks:
+  traefik:
+    name: traefik
+    external: true
