@@ -1,0 +1,24 @@
+version: '3.3'
+services:
+  uptime-kuma:
+    image: louislam/uptime-kuma:latest
+    container_name: uptime-kuma
+    volumes:
+      - ${uptime_kuma_volume_dev}
+    networks:
+      - traefik
+    labels:
+      - ${traefik_enable}
+      - ${traefik_http_routers_rule}
+      - ${traefik_http_router_entrypoints}
+      - ${traefik_http_routers_tls}
+      - ${traefik_http_routers_tls_certresolver}
+      - ${traefik_http_services}
+      # - TODO: Check for non interrupting update
+      - ${watchtower_auto_update}
+    restart: unless-stopped
+
+networks:
+  traefik:
+    name: traefik
+    external: true
