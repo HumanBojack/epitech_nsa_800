@@ -20,6 +20,7 @@ services:
       - "traefik.http.routers.prometheus.rule=Host(`prometheus.pdm.musubi.dev`)"
       - "traefik.http.routers.prometheus.entrypoints=websecure"
       - "traefik.http.routers.prometheus.tls.certresolver=letsencryptresolver"
+      - "traefik.http.routers.prometheus.tls=true"
       - "traefik.docker.network=traefik"
       # WatchTower auto update
       # TODO: Check for non interrupting update
@@ -27,46 +28,17 @@ services:
     restart: unless-stopped
 
   node-exporter:
+    image: quay.io/prometheus/node-exporter
     container_name: node-exporter
-    image: prom/node-exporter
-    networks:
-      - localprom
-      - traefik
-    ports:
-      - "9100:9100"
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.services.node-exporter.loadbalancer.server.port=9100"
-      - "traefik.http.routers.node-exporter.rule=Host(`node-exporter.pdm.musubi.dev`)"
-      - "traefik.http.routers.node-exporter.entrypoints=websecure"
-      - "traefik.http.routers.node-exporter.tls.certresolver=letsencryptresolver"
-      - "traefik.docker.network=traefik"
-      # WatchTower auto update
-      # TODO: Check for non interrupting update
-      - "com.centurylinklabs.watchtower.enable=true"
+    command:
+      - '--path.rootfs=/host'
+      - '--collector.hwmon'
     restart: unless-stopped
-
-  alert-manager:
-    container_name: alert-manager
-    image: prom/alertmanager
     volumes:
-      - "./alertmanager.yml:/alertmanager/alertmanager.yml"
+      - '/:/host:ro,rslave'
     networks:
       - localprom
-      - traefik
-    ports:
-      - "9093:9093"
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.services.alert-manager.loadbalancer.server.port=9093"
-      - "traefik.http.routers.alert-manager.rule=Host(`alert-manager.pdm.musubi.dev`)"
-      - "traefik.http.routers.alert-manager.entrypoints=websecure"
-      - "traefik.http.routers.alert-manager.tls.certresolver=letsencryptresolver"
-      - "traefik.docker.network=traefik"
-      # WatchTower auto update
-      # TODO: Check for non interrupting update
-      - "com.centurylinklabs.watchtower.enable=true"
-    restart: unless-stopped
+
     
 networks:
   localprom:
