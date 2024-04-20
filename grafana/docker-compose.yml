@@ -8,13 +8,6 @@ services:
     environment:
     - GF_SERVER_ROOT_URL=https://grafana.pdm.musubi.dev
     labels:
-    # traefik_enable="traefik.enable=true"
-    # traefik_http_routers_rule="traefik.http.routers.uptime_kuma.rule=Host(`uptime.pdm.musubi.dev`)"
-    # # - "traefik.http.routers.uptime-kuma.entrypoints=https"
-    # traefik_http_router_entrypoints="traefik.http.routers.uptime_kuma.entrypoints=websecure"
-    # traefik_http_routers_tls="traefik.http.routers.uptime_kuma.tls=true"
-    # traefik_http_routers_tls_certresolver="traefik.http.routers.uptime_kuma.tls.certresolver=letsencryptresolver"
-    # traefik_http_services="traefik.http.services.uptime_kuma.loadbalancer.server.port=3001"
     - "traefik.enable=true"
     - "traefik.http.routers.grafana.entrypoints=websecure"
     - "traefik.http.routers.grafana.tls.certresolver=letsencryptresolver"
@@ -22,9 +15,6 @@ services:
     - "traefik.http.routers.grafana.rule=Host(`grafana.pdm.musubi.dev`)"
     - "traefik.http.services.grafana.loadbalancer.server.port=3000"
     - "traefik.docker.network=traefik"
-    # WatchTower auto update
-    # TODO: Check for non interrupting update
-    - "com.centurylinklabs.watchtower.enable=true"
     volumes:
       - ./datasources:/etc/grafana/provisioning/datasources
       - grafana-storage:/var/lib/grafana
@@ -47,6 +37,7 @@ services:
     command: -config.file=/etc/loki/local-config.yaml
     networks:
       - default
+      # - traefik
 
 volumes:
   grafana-storage:
